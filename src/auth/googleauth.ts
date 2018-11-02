@@ -19,7 +19,6 @@ import {exec} from 'child_process';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as gcpMetadata from 'gcp-metadata';
-import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
 import * as stream from 'stream';
@@ -610,8 +609,7 @@ export class GoogleAuth {
    */
   private async getGCEProjectId() {
     try {
-      const r = await gcpMetadata.project('project-id');
-      return r.data;
+      return gcpMetadata.project<string>('project-id');
     } catch (e) {
       // Ignore any errors
       return null;
@@ -659,8 +657,8 @@ export class GoogleAuth {
     // NOTE: The trailing '/' at the end of service-accounts/ is very important!
     // The GCF metadata server doesn't respect querystring params if this / is
     // not included.
-    const {data} = await gcpMetadata.instance(
-        {property: 'service-accounts/', params: {recursive: true}});
+    const data = await gcpMetadata.instance(
+        {property: 'service-accounts/', params: {recursive: 'true'}});
 
     if (!data || !data.default || !data.default.email) {
       throw new Error('Failure from metadata server.');
